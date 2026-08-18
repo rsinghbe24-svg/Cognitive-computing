@@ -1,1 +1,226 @@
+import random
+from collections import Counter
 
+
+ROLL_NUMBER_STR = "1021034567"  # 10-digit roll number as string
+ROLL_NUMBER_INT = int(ROLL_NUMBER_STR)
+
+#### QUESTION 1: LISTS
+print("=== QUESTION 1: LISTS ===")
+original_digits = [int(digit) for digit in ROLL_NUMBER_STR]
+L = [digit * 10 for digit in original_digits]
+print(f"i. Initial List L: {L}")
+L.append(99)
+ append() adds the element to the very end of the list.
+print(f"ii. After append(99): {L}")
+
+L.insert(2, 45)
+ insert(index, value) places the element at index 2, shifting subsequent items right.
+print(f"    After insert(2, 45): {L}")
+
+ iii. Remove two elements (remove and pop)
+L.remove(45)  # Removes the first occurrence of 45
+print(f"iii. After remove(45): {L}")
+
+popped_val = L.pop(0)  # Removes and returns element at index 0
+print(f"     After pop(0) (removed {popped_val}): {L}")
+
+ iv. Sort ascending and descending
+L.sort()
+print(f"iv. Ascending order: {L}")
+
+L.sort(reverse=True)
+print(f"    Descending order: {L}")
+
+print(f"v. First three elements: {L[:3]}")
+print(f"   Last three elements: {L[-3:]}")
+
+
+avg_L = sum(L) / len(L)
+above_avg = [x for x in L if x > avg_L]
+print(f"vi. Average = {avg_L:.2f}, Elements > average: {above_avg}\n")
+
+
+
+# QUESTION 2: TUPLES
+
+print("=== QUESTION 2: TUPLES ===")
+
+
+scores = tuple(L[:8])
+print(f"Tuple 'scores': {scores}")
+
+
+max_score = max(scores)
+max_idx = scores.index(max_score)
+min_score = min(scores)
+min_count = scores.count(min_score)
+print(f"i. Highest score: {max_score} at index {max_idx}")
+print(f"   Lowest score: {min_score}, appears {min_count} time(s)")
+
+
+# Tuples cannot be reversed in-place because they are immutable; a new reversed list must be constructed.
+reversed_scores_list = list(reversed(scores))
+print(f"ii. Reversed scores as list: {reversed_scores_list}")
+
+
+user_score_str = input("iii. Enter a score to search in tuple: ")
+if user_score_str.isdigit():
+    user_score = int(user_score_str)
+    if user_score in scores:
+        print(f"     Score {user_score} found at first occurrence index: {scores.index(user_score)}")
+    else:
+        print(f"     Score {user_score} is not present in the tuple.")
+
+# iv. Attempting modification and error handling
+try:
+    scores[0] = 100
+except TypeError as e:
+    # Tuples are immutable and lack item assignment support, unlike mutable lists.
+    print(f"iv. Captured Error: {e}")
+
+# v. Unpacking using * operator
+first, second, *remaining = scores
+print(f"v. Unpacked -> First: {first}, Second: {second}, Remaining: {remaining}\n")
+
+
+# ==========================================
+# QUESTION 3: RANDOM NUMBERS & LOGIC
+# ==========================================
+print("=== QUESTION 3: RANDOM NUMBERS ===")
+
+# Set random seed
+random.seed(ROLL_NUMBER_INT)
+
+# i. Generate 100 random numbers between 100 and 900 (inclusive)
+rand_nums = [random.randint(100, 900) for _ in range(100)]
+
+# ii. Count odd numbers
+odd_nums = [x for x in rand_nums if x % 2 != 0]
+print(f"ii. Odd numbers count: {len(odd_nums)}")
+
+# iii. Count even numbers
+even_nums = [x for x in rand_nums if x % 2 == 0]
+print(f"iii. Even numbers count: {len(even_nums)}")
+
+# iv. Count and list prime numbers
+def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+prime_nums = [x for x in rand_nums if is_prime(x)]
+print(f"iv. Prime numbers count: {len(prime_nums)}")
+print(f"    List of prime numbers: {prime_nums}")
+
+# v. Most frequent number
+freq_counter = Counter(rand_nums)
+most_common_num, most_common_count = freq_counter.most_common(1)[0]
+print(f"v. Most frequent number: {most_common_num} (occurs {most_common_count} times)\n")
+
+
+# ==========================================
+# QUESTION 4: SETS
+# ==========================================
+print("=== QUESTION 4: SETS ===")
+
+# Using first 8 digits of roll number
+first_8_digits = original_digits[:8]
+
+set_A = {digit * 7 for digit in first_8_digits}
+set_B = {digit * 9 for digit in first_8_digits}
+print(f"Set A: {set_A}")
+print(f"Set B: {set_B}")
+
+# vi. Union
+print(f"vi. Union (A | B): {set_A.union(set_B)}")
+
+# vii. Intersection
+print(f"vii. Intersection (A & B): {set_A.intersection(set_B)}")
+
+# viii. Difference and comparison comment
+diff_A_B = set_A.difference(set_B)
+diff_B_A = set_B.difference(set_A)
+print(f"viii. A - B: {diff_A_B}")
+print(f"      B - A: {diff_B_A}")
+# difference() returns elements in one specific set only, whereas symmetric_difference() returns elements present in either set but not both.
+
+# ix. Symmetric Difference
+print(f"ix. Symmetric Difference: {set_A.symmetric_difference(set_B)}")
+
+# x. Subset and Superset
+print(f"x. Is A subset of B? {set_A.issubset(set_B)}")
+print(f"   Is B superset of A? {set_B.issuperset(set_A)}")
+
+# xi. Discard vs Remove
+x_val_str = input("xi. Enter a value X to discard from Set A: ")
+if x_val_str.isdigit():
+    x_val = int(x_val_str)
+    set_A.discard(x_val)
+    # discard() silently skips non-existent elements, whereas remove() raises a KeyError.
+    print(f"    Set A after discarding {x_val}: {set_A}\n")
+
+
+# ==========================================
+# QUESTION 5: DICTIONARIES
+# ==========================================
+print("=== QUESTION 5: DICTIONARIES ===")
+
+my_dict = {
+    "name": "Alex",
+    "roll_no": ROLL_NUMBER_STR,
+    "branch": "Computer Science",
+    "age": 20,
+    "city": "Patiala"
+}
+
+# i. Rename key "city" to "location"
+my_dict["location"] = my_dict.pop("city")
+print(f"i. Renamed key 'city' to 'location': {my_dict}")
+
+# ii. Add key "cgpa"
+my_dict["cgpa"] = 9.1
+print(f"ii. Added 'cgpa': {my_dict}")
+
+# iii. Update "age"
+my_dict["age"] += 1
+print(f"iii. Updated age: {my_dict}")
+
+# iv. Delete "branch" using two methods
+dict_copy1 = my_dict.copy()
+dict_copy2 = my_dict.copy()
+
+val_pop = dict_copy1.pop("branch")
+del dict_copy2["branch"]
+# pop() returns the removed value, whereas del directly deletes the key-value pair and returns nothing.
+
+# v. Iterate using .items()
+print("v. Dictionary Key-Value pairs:")
+for key, value in my_dict.items():
+    print(f"   {key} -> {value}")
+
+# vi. Safe key check using 'in'
+print("vi. Key existence check:")
+if "email" in my_dict:
+    print(f"   Email: {my_dict['email']}")
+else:
+    print("   Fallback: 'email' key does not exist in the dictionary.")
+
+# vii. Merge with friend_dict
+friend_dict = {
+    "name": "Sam",
+    "roll_no": "1021039999",
+    "branch": "Mechanical",
+    "age": 21,
+    "city": "Chandigarh"
+}
+merged_dict = {**my_dict, **friend_dict}
+# When two dictionaries share keys during unpacking, the values from the second dictionary override the first.
+print(f"vii. Merged Dictionary: {merged_dict}")
+
+# viii. Dictionary comprehension for string values
+str_only_dict = {k: v for k, v in my_dict.items() if isinstance(v, str)}
+print(f"viii. String values only: {str_only_dict}")
