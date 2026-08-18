@@ -1,0 +1,83 @@
+import pandas as pd
+
+# Q.1 Create a dataset as shown in the table
+data = {
+    'Tid': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    'Refund': ['Yes', 'No', 'No', 'Yes', 'No', 'No', 'Yes', 'No', 'No', 'No'],
+    'Marital Status': ['Single', 'Married', 'Single', 'Married', 'Divorced', 'Married', 'Divorced', 'Single', 'Married', 'Single'],
+    'Taxable Income': ['125K', '100K', '70K', '120K', '95K', '60K', '220K', '85K', '75K', '90K'],
+    'Cheat': ['No', 'No', 'No', 'No', 'Yes', 'No', 'No', 'Yes', 'No', 'Yes']
+}
+
+df = pd.DataFrame(data)
+
+print("--- Q.1 Created DataFrame ---")
+print(df)
+print("\n" + "="*40 + "\n")
+
+# Q.2 Locate row 0, 4, 7 and 8 using DataFrame
+# Note: Using .iloc for 0-based integer indexing (0 corresponds to Tid 1, 4 to Tid 5, etc.)
+selected_rows = df.iloc[[0, 4, 7, 8]]
+
+print("--- Q.2 Located Rows (0, 4, 7, 8) ---")
+print(selected_rows)
+import pandas as pd
+
+# Recreating the DataFrame from Q.1 for context
+data = {
+    'Tid': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    'Refund': ['Yes', 'No', 'No', 'Yes', 'No', 'No', 'Yes', 'No', 'No', 'No'],
+    'Marital Status': ['Single', 'Married', 'Single', 'Married', 'Divorced', 'Married', 'Divorced', 'Single', 'Married', 'Single'],
+    'Taxable Income': ['125K', '100K', '70K', '120K', '95K', '60K', '220K', '85K', '75K', '90K'],
+    'Cheat': ['No', 'No', 'No', 'No', 'Yes', 'No', 'No', 'Yes', 'No', 'Yes']
+}
+
+df = pd.DataFrame(data)
+
+# ==========================================
+# QUESTION 3: NAVIGATING THE DATAFRAME
+# ==========================================
+print("=== QUESTION 3 ===")
+
+# 1. Select rows from index 3 to 7 (inclusive of index 7 using slice 3:8)
+q3_1 = df.iloc[3:8]
+print("1. Rows from index 3 to 7:")
+print(q3_1)
+print("\n" + "-"*40 + "\n")
+
+# 2. Select rows from index 4 to 8, and columns 2 to 4 (columns at index 2, 3)
+q3_2 = df.iloc[4:9, 2:4]
+print("2. Rows 4 to 8, columns 2 to 4:")
+print(q3_2)
+print("\n" + "-"*40 + "\n")
+
+# 3. Select all rows with column index 1 to 3 (inclusive of index 3)
+q3_3 = df.iloc[:, 1:4]
+print("3. All rows, columns 1 to 3:")
+print(q3_3)
+print("\n" + "="*40 + "\n")
+
+
+# ==========================================
+# QUESTION 4: READ CSV & DISPLAY FIRST 5 ROWS
+# ==========================================
+print("=== QUESTION 4 ===")
+
+# Replace 'iris.csv' with the actual file path if saved in a different folder
+iris_df = pd.read_csv('iris.csv')
+
+print("First 5 rows of the Iris dataset:")
+print(iris_df.head())
+print("\n" + "="*40 + "\n")
+
+
+# ==========================================
+# QUESTION 5: DELETE ROW 4 AND COLUMN 3
+# ==========================================
+print("=== QUESTION 5 ===")
+
+# Drop row at index 4 (axis=0) and column at index 3 (axis=1)
+modified_iris = iris_df.drop(index=4).drop(columns=iris_df.columns[3])
+
+print("DataFrame after deleting row 4 and column 3:")
+print(modified_iris.head(7))  # Displaying top rows to verify row index 4 removal
