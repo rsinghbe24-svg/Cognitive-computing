@@ -1,0 +1,114 @@
+# Extract unique final tokens across all tickets
+all_final_tokens = set()
+for res in processed_data:
+    all_final_tokens.update(res['final_tokens'])
+
+sorted_final_tokens = sorted(list(all_final_tokens))
+
+# Initialize Stemmers & Lemmatizer
+p_stemmer = PorterStemmer()
+l_stemmer = LancasterStemmer()
+w_lemmatizer = WordNetLemmatizer()
+
+# Target suffix: 'ing'
+r_stemmer = RegexpStemmer('ing$', min=4)
+
+def get_wordnet_pos(treebank_tag):
+    if treebank_tag.startswith('J'):
+        return wordnet.ADJ
+    elif treebank_tag.startswith('V'):
+        return wordnet.VERB
+    elif treebank_tag.startswith('N'):
+        return wordnet.NOUN
+    elif treebank_tag.startswith('R'):
+        return wordnet.ADV
+    else:
+        return wordnet.NOUN
+
+# Get POS tags
+pos_tags = dict(nltk.pos_tag(sorted_final_tokens))
+
+comparison_rows = []
+for word in sorted_final_tokens:
+    p_out = p_stemmer.stem(word)
+    l_out = l_stemmer.stem(word)
+    r_out = r_stemmer.stem(word)
+    
+    wn_pos = get_wordnet_pos(pos_tags.get(word, 'N'))
+    lem_out = w_lemmatizer.lemmatize(word, pos=wn_pos)
+    
+    # Include only tokens where outputs differ across methods
+    if len({p_out, l_out, r_out, lem_out}) > 1:
+        comparison_rows.append({
+            'Original Word': word,
+            'POS Tag': pos_tags.get(word, ''),
+            'Porter': p_out,
+            'Lancaster': l_out,
+            'RegexpStemmer': r_out,
+            'WordNet Lemmatizer': lem_out
+        })
+
+df_t4 = pd.DataFrame(comparison_rows)
+print("--- TASK 4: Stemming vs Lemmatization Comparison Table ---")
+display(df_t4)
+
+
+# S1, S2, S3, S4 corpus constructions
+S1 = []
+for t in tickets:
+    S1.extend(word_tokenize(t))
+
+S2 = [t for t in S1 if not re.match(r'^[^\w\s]+$', t)]
+
+S3 = []
+for res in processed_data:
+    S3.extend(res['final_tokens'])
+
+S4 = [p_stemmer.stem(t) for t in S3]
+
+def calc_stats(token_list):
+    total = len(token_list)
+    unique = len(set(token_list))
+    ttr = unique / total if total > 0 else 0
+    return total, unique, round(ttr, 4)
+
+stats_data = {
+    'Corpus Level': ['S1 (All Tokens)', 'S2 (No Punctuation)', 'S3 (Final Tokens)', 'S4 (Porter Stemmed)'],
+    'Total Tokens': [calc_stats(S1)[0], calc_stats(S2)[0], calc_stats(S3)[0], calc_stats(S4)[0]],
+    'Unique Tokens': [calc_stats(S1)[1], calc_stats(S2)[1], calc_stats(S3)[1], calc_stats(S4)[1]],
+    'TTR (Type-Token Ratio)': [calc_stats(S1)[2], calc_stats(S2)[2], calc_stats(S3)[2], calc_stats(S4)[2]]
+}
+
+df_stats = pd.DataFrame(stats_data)
+print("--- TASK 5: Corpus Statistics ---")
+display(df_stats)
+
+# Top 10 Words
+top10_s1 = collections.Counter(S1).most_common(10)
+top10_s3 = collections.Counter(S3).most_common(10)
+
+print("\nTop 10 Words in S1:", top10_s1)
+print("Top 10 Words in S3:", top10_s3)
+
+# Top 5 Bigrams
+s1_bigrams = list(nltk.bigrams(S1))
+s3_bigrams = list(nltk.bigrams(S3))
+
+print("\nTop 5 Bigrams in S1:", collections.Counter(s1_bigrams).most_common(5))
+print("Top 5 Bigrams in S3:", collections.Counter(s3_bigrams).most_common(5))
+
+# Plot log(rank) vs log(frequency) for S3
+counts_s3 = collections.Counter(S3).most_common()
+frequencies = [count for word, count in counts_s3]
+ranks = list(range(1, len(frequencies) + 1))
+
+log_ranks = [math.log(r) for r in ranks]
+log_freqs = [math.log(f) for f in frequencies]
+
+plt.figure(figsize=(7, 5))
+plt.plot(log_ranks, log_freqs, marker='o', linestyle='-', color='b')
+plt.title("Zipf's Law: log(Rank) vs log(Frequency) for S3")
+plt.xlabel("log(Rank)")
+plt.ylabel("log(Frequency)")
+plt.grid(True)
+plt.show()
